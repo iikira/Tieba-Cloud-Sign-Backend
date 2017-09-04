@@ -28,8 +28,8 @@ BeijingTimeOption 根据给定的 get 返回时间格式.
 */
 func BeijingTimeOption(get string) string {
 	//获取北京（东八区）时间
-	d, _ := time.ParseDuration("+8h") //东八区
-	now := time.Now().Add(d).UTC()
+	CSTLoc := time.FixedZone("CST", 8*3600) // 东8区
+	now := time.Now().In(CSTLoc)
 	year, mon, day := now.Date()
 	hour, min, sec := now.Clock()
 	millisecond := now.Nanosecond() / 1e6
