@@ -22,7 +22,7 @@ func HTTPGet(urlStr string) (body []byte, err error) {
 
 //Fetch 实现 http／https 访问 和 GET／POST 请求，根据给定的 urlStr (网址), jar (cookie容器 指针), post (post数据 指针), header (请求头数据 指针) 进行网站访问。
 //返回值分别为 网站主体, 错误
-func Fetch(urlStr string, jar *cookiejar.Jar, post, header *map[string]string) (body []byte, err error) {
+func Fetch(urlStr string, jar *cookiejar.Jar, post, header map[string]string) (body []byte, err error) {
 	URL, err := url.Parse(urlStr)
 	if err != nil {
 		log.Fatalln(err)
@@ -43,7 +43,7 @@ func Fetch(urlStr string, jar *cookiejar.Jar, post, header *map[string]string) (
 		addHeader(req, header)
 	} else {
 		query := url.Values{}
-		for k, v := range *post {
+		for k, v := range post {
 			query.Set(k, v)
 		}
 		req, _ = http.NewRequest("POST", urlStr, strings.NewReader(query.Encode()))
@@ -57,9 +57,9 @@ func Fetch(urlStr string, jar *cookiejar.Jar, post, header *map[string]string) (
 	return ioutil.ReadAll(resp.Body)
 }
 
-func addHeader(req *http.Request, header *map[string]string) {
+func addHeader(req *http.Request, header map[string]string) {
 	if header != nil {
-		for Header, HeaderMessage := range *header {
+		for Header, HeaderMessage := range header {
 			req.Header.Add(Header, HeaderMessage)
 		}
 	}
