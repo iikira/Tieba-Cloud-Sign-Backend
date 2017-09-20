@@ -3,8 +3,11 @@ package baiduUtil
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/md5"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http/cookiejar"
 	"net/url"
@@ -109,6 +112,16 @@ func Md5Encrypt(str interface{}) string {
 		return ""
 	}
 	return fmt.Sprintf("%X", md5Ctx.Sum(nil))
+}
+
+// DecompressGZIP 对 io.Reader 数据, 进行 gzip 解压
+func DecompressGZIP(r io.Reader) ([]byte, error) {
+	gzipReader, err := gzip.NewReader(r)
+	if err != nil {
+		return nil, err
+	}
+	gzipReader.Close()
+	return ioutil.ReadAll(gzipReader)
 }
 
 // PrintErrIfExist 简易错误处理, 如果 err 存在, 就只向屏幕输出 err 。
