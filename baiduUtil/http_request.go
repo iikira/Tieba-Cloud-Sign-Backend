@@ -33,7 +33,7 @@ func Fetch(urlStr string, jar *cookiejar.Jar, post, header map[string]string) (b
 		httpClient.Transport = &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	}
 
-	if _, ok := header["Accept-Encoding"]; !ok {
+	if _, ok := header["Accept-Encoding"]; !ok && header != nil {
 		header["Accept-Encoding"] = "gzip"
 	}
 	if post == nil {
