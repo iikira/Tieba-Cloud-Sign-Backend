@@ -10,6 +10,11 @@ import (
 	"strings"
 )
 
+var (
+	//IsGzip 是否启用Gzip
+	IsGzip = true
+)
+
 // HTTPGet 简单实现 http 访问 GET 请求
 func HTTPGet(urlStr string) (body []byte, err error) {
 	resp, err := http.Get(urlStr)
@@ -33,7 +38,7 @@ func Fetch(urlStr string, jar *cookiejar.Jar, post, header map[string]string) (b
 		httpClient.Transport = &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	}
 
-	if _, ok := header["Accept-Encoding"]; !ok && header != nil {
+	if _, ok := header["Accept-Encoding"]; !ok && header != nil && IsGzip {
 		header["Accept-Encoding"] = "gzip"
 	}
 	if post == nil {
@@ -57,14 +62,16 @@ func Fetch(urlStr string, jar *cookiejar.Jar, post, header map[string]string) (b
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	body, _ = ioutil.ReadAll(resp.Body)
-	undatas, err := DecompressGZIP(bytes.NewReader(body))
-	if err != nil {
-		return body, nil
+	if IsGzip {
+		undatas, err := DecompressGZIP(bytes.NewReader(body))
+		if err == nil {
+			return undatas, nil
+		}
 	}
-	return undatas, nil
+	resp.Body.Close()
+	return body, nil
 }
 
 func addHeader(req *http.Request, header map[string]string) {
